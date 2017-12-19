@@ -68,26 +68,29 @@
 </div>
 <!--Editing the game-->
 <style>
-    .addBtn a{
-        color:white;
+    .addBtn a {
+        color: white;
     }
+
     #editGame .container .row .col-xs-12 .gameInfo .gameTitle {
-        display:block;
+        display: block;
     }
+
     #editGame .container .row .col-xs-12 img {
-        width:38%;
-        margin-top:20px;
+        width: 38%;
+        margin-top: 20px;
     }
+
     #editGame .container .row .col-xs-12 .gameInfo .gameTitle div {
-        margin-top:20px;
-        display:inline-block;
-        font-size:1.8em;
+        margin-top: 20px;
+        display: inline-block;
+        font-size: 1.8em;
         background: #043687;
-        color:white;
+        color: white;
         font-family: 'Open Sans Condensed', sans-serif;
-        padding:10px 40px;
-        width:25%;
-        text-align:center;
+        padding: 10px 40px;
+        width: 25%;
+        text-align: center;
     }
 </style>
 <section id="editGame">
@@ -108,7 +111,7 @@
                                         <div>@team.Name</div>
                                     }
                                 }
-                                
+
                                 foreach (var team in ViewBag.allTeamsList)
                                 {
                                     if (game.Team2_id == team.Id)
@@ -116,8 +119,16 @@
                                         <div>@team.Name</div>
                                     }
                                 }
+                                if (!(game.Score == null))
+                                {
+                                    <div>
+                                        Score: @game.Score
+                                    </div>
+                                }
+
                             }
                         }
+
                     </div>
                     <div class="players" style="margin-top:30px">
                         <section id="allPlayersTable">
@@ -163,10 +174,46 @@
                             </div>
                         </section>
                     </div>
-                    <button class="btn btn-success addBtn">@Html.ActionLink("Add me to the gamelist","AddPlayer","Games")</button>
+                    <button class="btn btn-success addBtn">@Html.ActionLink("Add me to the gamelist", "AddPlayer", "Games")</button>
                 </div>
             </div> <!-- /.col-xs-12 -->
         </div> <!-- /.row -->
     </div> <!-- /.container -->
 </section>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
 
+            @foreach (var userGames in ViewBag.allUsersGamesList)
+            {
+                foreach (var user in ViewBag.allUserList)
+                {
+                    if (user.Username == ViewBag.curUser)
+                    {
+                        CurrentUserIdHolder.curUserId = user.Id;
+                        break;
+                    }
+                }
+                if (userGames.Game_id == ViewBag.gameId && userGames.User_id == CurrentUserIdHolder.curUserId)
+                {
+                    // checking if the score has already been submitted
+                    foreach (var game in ViewBag.allGamesList)
+                    {
+                        if (game.Id == userGames.Game_id && game.Score == null)
+                        {
+                            using (Html.BeginForm("EditGame", "Games", new { id = EditGameIdHolder.currentEditGameId }, FormMethod.Post, new { style = "margin-top:50px" }))
+                            {
+                                <div class="form-group">
+                                    <label for="score" class="sr-only">Email</label>
+                                    <input type="text" name="score" id="score" class="form-control" placeholder="For Example: 1-2">
+                                </div>
+
+                                <input type="submit" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Submit Final Score of the Game">
+                            }
+                        }
+                    }
+                }
+            }
+        </div> <!-- /.col-xs-12 -->
+    </div> <!-- /.row -->
+</div> <!-- /.container -->

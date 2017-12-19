@@ -21,6 +21,8 @@ namespace FootballAppMVC.Controllers
         public ActionResult SignUp(string Name, string username, int Age, string Email,
             string Sex, string Password, string Passwordr)
         {
+            List<User> Register = myTables.User.ToList();
+            bool users = true, emails = true;
             User user = new User();
             user.Name = Name;
             user.Username = username;
@@ -28,12 +30,32 @@ namespace FootballAppMVC.Controllers
             user.Age = Age;
             user.Sex = Sex;
             user.Password = Password;
-            if (Password == Passwordr)
+            foreach (var name in Register)
+            {
+                if (name.Username == username)
+                {
+                    users = false;
+                    break;
+                }
+            }
+            foreach (var emaill in Register)
+            {
+                if (emaill.Email == Email)
+                {
+                    emails = false;
+                    break;
+                }
+            }
+            if (!(Password == Passwordr && users == true && emails == true))
+            {
+                return RedirectToAction("IncorrectSignUp", "Error");
+            }
+            if (Password == Passwordr && users == true && emails == true)
             {
                 myTables.User.Add(user);
                 myTables.SaveChanges();
             }
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

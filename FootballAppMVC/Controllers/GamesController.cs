@@ -12,6 +12,10 @@ namespace FootballAppMVC.Controllers
     {
         static public int currentEditGameId = 0;
     }
+    public class CurrentUserIdHolder
+    {
+        static public int curUserId = 0;
+    }
     public class GamesController : Controller
     {
         FootDbEntities myTables = new FootDbEntities();
@@ -83,28 +87,66 @@ namespace FootballAppMVC.Controllers
             ViewBag.allUserList = userList;
             return View(menuItems);
         }
-        
-        public ActionResult AddPlayer()
+        [HttpPost]
+        public ActionResult EditGame(int id, string score)
         {
-            List<User> userList = myTables.User.ToList();
-            ViewBag.allUserList = userList;
-            if (CurrentUserHolder.currentUsername == "")
+            List<Games> allGames = myTables.Games.ToList();
+            foreach (var game in allGames)
             {
-                return RedirectToAction("GoLogin","Error");
-            }
-            UserAndGamesPivot newPlayer = new UserAndGamesPivot();
-            foreach (var user in userList)
-            {
-                if (user.Username == CurrentUserHolder.currentUsername)
+                if (game.Id == id)
                 {
-                    newPlayer.User_id = user.Id;
-                    newPlayer.Game_id = EditGameIdHolder.currentEditGameId;
-                    myTables.UserAndGamesPivot.Add(newPlayer);
-                    break;
+                    game.Score = score; // has to be changed
                 }
             }
             myTables.SaveChanges();
-            return RedirectToAction("EditGame","Games",new { id = EditGameIdHolder.currentEditGameId});
+            return RedirectToAction("AllGames","Games");
         }
-    }
-}
+
+
+        public ActionResult AddPlayer()
+                {
+                    bool Player = true;
+
+                    List<User> userList = myTables.User.ToList();
+                    List<UserAndGamesPivot> Pivot = myTables.UserAndGamesPivot.ToList();
+                    ViewBag.allUserList = userList;
+                    if (CurrentUserHolder.currentUsername == "")
+                    {
+                        return RedirectToAction("GoLogin", "Error");
+                    }
+                    UserAndGamesPivot newPlayer = new UserAndGamesPivot();
+
+
+                    foreach (var user in userList)
+                    {
+
+                        if (user.Username == CurrentUserHolder.currentUsername)
+                        {
+                            foreach (var id in Pivot)
+                            {
+                                if (user.Id == id.User_id && EditGameIdHolder.currentEditGameId == id.Game_id)
+                                {
+                                    Player = false;
+                                    break;
+
+                                }
+                            }
+                            if (Player == true)
+                            {
+                                newPlayer.User_id = user.Id;
+                                newPlayer.Game_id = EditGameIdHolder.currentEditGameId;
+                                myTables.UserAndGamesPivot.Add(newPlayer);
+                                break;
+                            }
+
+                        }
+                    }
+                    myTables.SaveChanges();
+                    if (Player == false)
+                    {
+                        return Content("You are already in this game");
+                    }
+                    return RedirectToAction("EditGame", "Games", new { id = EditGameIdHolder.currentEditGameId });
+                }
+            }
+        }

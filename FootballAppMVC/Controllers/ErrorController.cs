@@ -18,5 +18,17 @@ namespace FootballAppMVC.Controllers
             List<MainMenu> menuItems = myTables.MainMenu.ToList();
             return View(menuItems);
         }
+        public ActionResult IncorrectLogin()
+        {
+            ViewBag.curUser = CurrentUserHolder.currentUsername;
+            List<MainMenu> menuItems = myTables.MainMenu.ToList();
+            return View(menuItems);
+        }
+        public ActionResult IncorrectSignUp()
+        {
+            ViewBag.curUser = CurrentUserHolder.currentUsername;
+            List<MainMenu> menuItems = myTables.MainMenu.ToList();
+            return View(menuItems);
+        }
     }
 }

@@ -40,7 +40,7 @@ namespace FootballAppMVC.Controllers
             }
             else
             {
-                return HttpNotFound();
+                return RedirectToAction("IncorrectLogin","Error");
             }
 
             return RedirectToAction("Index","Home");
